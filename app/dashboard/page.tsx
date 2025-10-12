@@ -4,6 +4,9 @@ import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
 import { Inter, Lusitana } from 'next/font/google';
 import { fetchRevenue } from '@/app/lib/data';
 
+
+// Removed duplicate default export function Page
+
 const lusitana = Lusitana({ subsets: ['latin'], weight: '400' });
 
 export default async function Page() {
@@ -27,7 +30,6 @@ export default async function Page() {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
-        {/* ✅ Uncommented line */}
         <RevenueChart revenue={revenue} />
         {/* <LatestInvoices latestInvoices={latestInvoices} /> */}
       </div>

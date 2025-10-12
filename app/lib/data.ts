@@ -1,6 +1,6 @@
 // app/lib/data.ts
 export async function fetchRevenue() {
-  // 🧩 Temporary mock data (instead of database query)
+  // temporary data for testing chart
   return [
     { month: 'January', revenue: 12000 },
     { month: 'February', revenue: 8000 },
