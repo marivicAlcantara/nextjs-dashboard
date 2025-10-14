@@ -1,16 +1,14 @@
 import { Card } from '@/app/ui/dashboard/cards';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
-import { Inter, Lusitana } from 'next/font/google';
+import { Lusitana } from 'next/font/google';   // ✅ Correct font import
 import { fetchRevenue } from '@/app/lib/data';
-
-
-// Removed duplicate default export function Page
 
 const lusitana = Lusitana({ subsets: ['latin'], weight: '400' });
 
 export default async function Page() {
   const revenue = await fetchRevenue();
+  // You can fetch other data here later (e.g., totalPaidInvoices, etc.)
 
   return (
     <main>
@@ -19,14 +17,12 @@ export default async function Page() {
       </h1>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {/* <Card title="Collected" value={totalPaidInvoices} type="collected" /> */}
-        {/* <Card title="Pending" value={totalPendingInvoices} type="pending" /> */}
-        {/* <Card title="Total Invoices" value={numberOfInvoices} type="invoices" /> */}
-        {/* <Card
-          title="Total Customers"
-          value={numberOfCustomers}
-          type="customers"
-        /> */}
+        {/* Example usage when you add values later:
+        <Card title="Collected" value={totalPaidInvoices} type="collected" />
+        <Card title="Pending" value={totalPendingInvoices} type="pending" />
+        <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
+        <Card title="Total Customers" value={numberOfCustomers} type="customers" />
+        */}
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">

@@ -1,13 +1,7 @@
 import Image from 'next/image';
-// Ensure the fonts.ts file exists at the correct path and exports 'lusitana'
-import { Inter, Lusitana } from 'next/font/google';
+import { lusitana } from '@/app/ui/font'; // ✅ correct import path
 import Search from '@/app/ui/search';
-import {
-  CustomersTableType,
-  FormattedCustomersTable,
-} from '@/app/lib/definitions';
-
-const lusitana = Lusitana({ subsets: ['latin'], weight: '400' });
+import { CustomersTableType, FormattedCustomersTable } from '@/app/lib/definitions';
 
 export default async function CustomersTable({
   customers,
@@ -24,6 +18,7 @@ export default async function CustomersTable({
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
             <div className="overflow-hidden rounded-md bg-gray-50 p-2 md:pt-0">
+              {/* Mobile view */}
               <div className="md:hidden">
                 {customers?.map((customer) => (
                   <div
@@ -65,6 +60,8 @@ export default async function CustomersTable({
                   </div>
                 ))}
               </div>
+
+              {/* Desktop view */}
               <table className="hidden min-w-full rounded-md text-gray-900 md:table">
                 <thead className="rounded-md bg-gray-50 text-left text-sm font-normal">
                   <tr>
@@ -85,7 +82,6 @@ export default async function CustomersTable({
                     </th>
                   </tr>
                 </thead>
-
                 <tbody className="divide-y divide-gray-200 text-gray-900">
                   {customers.map((customer) => (
                     <tr key={customer.id} className="group">
