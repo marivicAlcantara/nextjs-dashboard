@@ -1,5 +1,13 @@
 // app/lib/data.ts
 
+// --- PostgreSQL import and connection setup ---
+import postgres from 'postgres';
+
+// Use your database URL from environment variables
+// Make sure you have this in your .env.local file:
+// POSTGRES_URL="postgres://user:password@hostname:port/database"
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+
 // --- Sample revenue data (used for your Revenue Chart) ---
 export async function fetchRevenue() {
   // temporary data for testing chart

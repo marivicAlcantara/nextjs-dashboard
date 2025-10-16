@@ -1,33 +1,33 @@
 import { Card } from '@/app/ui/dashboard/cards';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
-import { Lusitana } from 'next/font/google';   // ✅ Correct font import
-import { fetchRevenue } from '@/app/lib/data';
+import { Lusitana } from 'next/font/google';
+import { fetchRevenue, fetchFilteredInvoices } from '@/app/lib/data';
 
 const lusitana = Lusitana({ subsets: ['latin'], weight: '400' });
 
 export default async function Page() {
   const revenue = await fetchRevenue();
-  // You can fetch other data here later (e.g., totalPaidInvoices, etc.)
+  const latestInvoices = await fetchFilteredInvoices('', 1); // show first page invoices
 
   return (
-    <main>
-      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+    <main className="p-6">
+      <h1 className={`${lusitana.className} mb-6 text-2xl font-bold`}>
         Dashboard
       </h1>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Example usage when you add values later:
-        <Card title="Collected" value={totalPaidInvoices} type="collected" />
+      {/* Metric cards section (optional for future data) */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        {/* <Card title="Collected" value={totalPaidInvoices} type="collected" />
         <Card title="Pending" value={totalPendingInvoices} type="pending" />
         <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
-        <Card title="Total Customers" value={numberOfCustomers} type="customers" />
-        */}
+        <Card title="Total Customers" value={numberOfCustomers} type="customers" /> */}
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
+      {/* Main dashboard content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RevenueChart revenue={revenue} />
-        {/* <LatestInvoices latestInvoices={latestInvoices} /> */}
+        <LatestInvoices latestInvoices={latestInvoices} />
       </div>
     </main>
   );
