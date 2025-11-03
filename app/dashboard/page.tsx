@@ -9,12 +9,15 @@ import {
   fetchCardData,
 } from '@/app/lib/data';
 
+// ✅ Force dynamic rendering (SSR every request)
+export const dynamic = 'force-dynamic';
+
 const lusitana = Lusitana({ subsets: ['latin'], weight: '400' });
 
 export default async function Page() {
+  // ✅ Data fetched on each request
   const revenue = await fetchRevenue();
-  const latestInvoices = await fetchLatestInvoices('', 1); // first page
-
+  const latestInvoices = await fetchLatestInvoices('', 1);
   const {
     totalPaidInvoices,
     totalPendingInvoices,
@@ -41,6 +44,10 @@ export default async function Page() {
         <RevenueChart revenue={revenue} />
         <LatestInvoices latestInvoices={latestInvoices} />
       </div>
+
+      <p className="mt-8 text-sm text-gray-500">
+        🔄 This dashboard is dynamically rendered on every request.
+      </p>
     </main>
   );
 }

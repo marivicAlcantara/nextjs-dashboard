@@ -8,6 +8,7 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 // --- Sample revenue data (used for your Revenue Chart) ---
 export async function fetchRevenue() {
+  
   return [
     { month: 'January', revenue: 12000 },
     { month: 'February', revenue: 8000 },
