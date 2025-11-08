@@ -1,6 +1,8 @@
 'use client';
 
-export default function LatestInvoices({ latestInvoices }: { latestInvoices: any[] }) {
+import { fetchLatestInvoices } from '@/app/lib/data';
+
+export default async function LatestInvoices({ latestInvoices }: { latestInvoices: any[] }) {
   return (
     <div className="bg-white p-4 rounded-xl shadow-md">
       <h2 className="text-lg font-semibold mb-3">Latest Invoices</h2>
