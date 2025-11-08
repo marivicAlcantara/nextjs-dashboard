@@ -9,6 +9,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { fetchRevenue } from '@/app/lib/data';
+
 
 export default function RevenueChart({ revenue }: { revenue: any[] }) {
   return (

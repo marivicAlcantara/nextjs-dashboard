@@ -8,6 +8,8 @@ import {
   fetchLatestInvoices,
   fetchCardData,
 } from '@/app/lib/data';
+import { Suspense } from 'react';
+import { RevenueChartSkeleton } from '@/app/ui/skeletons';
 
 // ✅ Force dynamic rendering (SSR every request)
 export const dynamic = 'force-dynamic';
@@ -41,7 +43,9 @@ export default async function Page() {
 
       {/* --- Charts & Latest Invoices --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RevenueChart revenue={revenue} />
+        <Suspense fallback={<RevenueChartSkeleton />}>
+          <RevenueChart revenue={[]} />
+        </Suspense>
         <LatestInvoices latestInvoices={latestInvoices} />
       </div>
 
