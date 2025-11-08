@@ -2,11 +2,18 @@ import Image from 'next/image';
 import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
 import InvoiceStatus from '@/app/ui/invoices/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
-import { fetchFilteredInvoices } from '@/app/lib/data';
+import { fetchLatestInvoices } from '@/app/lib/data';
+import { StaticImport } from 'next/dist/shared/lib/get-img-props';
+import {
+  ReactElement,
+  JSXElementConstructor,
+  ReactNode,
+  ReactPortal,
+} from 'react';
 
-// Define the invoice type (this helps TypeScript understand the data shape)
+// ✅ Define the invoice type
 interface Invoice {
-  id: string | number; // handles both string or numeric IDs
+  id: string | number;
   name: string;
   email: string;
   image_url: string;
@@ -15,7 +22,7 @@ interface Invoice {
   status: string;
 }
 
-// Define props for this component
+// ✅ Define props for this component
 interface InvoicesTableProps {
   query: string;
   currentPage: number;
@@ -25,15 +32,17 @@ export default async function InvoicesTable({
   query,
   currentPage,
 }: InvoicesTableProps) {
-  const invoices: Invoice[] = await fetchFilteredInvoices(query, currentPage);
+  // ✅ Fetch invoice data
+  const invoices = await fetchLatestInvoices(query, currentPage);
 
+  // ✅ Properly return the JSX
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           {/* -------- Mobile View -------- */}
           <div className="md:hidden">
-            {invoices?.map((invoice) => (
+            {invoices?.map((invoice: Invoice) => (
               <div
                 key={String(invoice.id)}
                 className="mb-2 w-full rounded-md bg-white p-4"
@@ -63,7 +72,6 @@ export default async function InvoicesTable({
                     <p>{formatDateToLocal(invoice.date)}</p>
                   </div>
                   <div className="flex justify-end gap-2">
-                    {/* ✅ Fixed: Ensure ID is always a string */}
                     <UpdateInvoice id={String(invoice.id)} />
                     <DeleteInvoice id={String(invoice.id)} />
                   </div>
@@ -88,7 +96,7 @@ export default async function InvoicesTable({
             </thead>
 
             <tbody className="bg-white">
-              {invoices?.map((invoice) => (
+              {invoices?.map((invoice: Invoice) => (
                 <tr
                   key={String(invoice.id)}
                   className="w-full border-b py-3 text-sm last-of-type:border-none"
@@ -119,7 +127,6 @@ export default async function InvoicesTable({
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
-                      {/* ✅ Fixed: Convert ID to string explicitly */}
                       <UpdateInvoice id={String(invoice.id)} />
                       <DeleteInvoice id={String(invoice.id)} />
                     </div>
