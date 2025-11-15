@@ -75,10 +75,10 @@ export type FormattedCustomersTable = {
   total_paid: string;
 };
 
-export type CustomerField = {
-  id: string;
+export interface CustomerField {
+  id: number;    // <-- change string → number
   name: string;
-};
+}
 
 export type InvoiceForm = {
   id: string;

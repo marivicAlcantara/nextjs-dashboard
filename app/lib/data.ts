@@ -4,6 +4,9 @@ import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
+// ----------------------
+// REVENUE
+// ----------------------
 export async function fetchRevenue() {
   return [
     { month: 'January', revenue: 12000 },
@@ -14,6 +17,9 @@ export async function fetchRevenue() {
   ];
 }
 
+// ----------------------
+// LATEST INVOICES (with filtering + pagination)
+// ----------------------
 export async function fetchLatestInvoices(query: string, currentPage: number) {
   await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -30,12 +36,12 @@ export async function fetchLatestInvoices(query: string, currentPage: number) {
 
   const itemsPerPage = 5;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
-
-  return paginated;
+  return filtered.slice(startIndex, startIndex + itemsPerPage);
 }
 
-// --- Mock customer data ---
+// ----------------------
+// MOCK CUSTOMERS
+// ----------------------
 const customers = [
   { id: 1, name: 'John Doe', email: 'john@example.com' },
   { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
@@ -43,6 +49,15 @@ const customers = [
   { id: 4, name: 'Angela Cruz', email: 'angela@example.com' },
 ];
 
+// ✅ FIX: EXPORT THIS (You were missing this)
+export async function fetchCustomers() {
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  return customers;
+}
+
+// ----------------------
+// DASHBOARD CARD DATA
+// ----------------------
 export async function fetchCardData() {
   await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -61,18 +76,17 @@ export async function fetchCardData() {
     .filter((i) => i.status === 'pending')
     .reduce((sum, i) => sum + i.amount, 0);
 
-  const numberOfInvoices = invoices.length;
-  const numberOfCustomers = customers.length;
-
   return {
     totalPaidInvoices,
     totalPendingInvoices,
-    numberOfInvoices,
-    numberOfCustomers,
+    numberOfInvoices: invoices.length,
+    numberOfCustomers: customers.length,
   };
 }
 
-// --- ADD THIS BELOW (must be OUTSIDE all functions!) ---
+// ----------------------
+// PAGE COUNT (pagination helper)
+// ----------------------
 export async function fetchInvoicesPages(query: string) {
   const invoices = [
     { id: 1, name: 'John Doe', email: 'john@example.com', amount: 1200, status: 'paid' },
@@ -86,6 +100,5 @@ export async function fetchInvoicesPages(query: string) {
   );
 
   const itemsPerPage = 5;
-  const pages = Math.ceil(filtered.length / itemsPerPage);
-  return pages;
+  return Math.ceil(filtered.length / itemsPerPage);
 }
