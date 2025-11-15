@@ -1,5 +1,4 @@
 // app/dashboard/page.tsx
-//import { Card } from '@/app/ui/dashboard/cards';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
 import { Lusitana } from 'next/font/google';
@@ -10,19 +9,20 @@ import {
   fetchCardData,
 } from '@/app/lib/data';
 import { Suspense } from 'react';
-import { RevenueChartSkeleton,
-         LatestInvoicesSkeleton,
-        CardsSkeleton, } from '@/app/ui/skeletons';
+import {
+  RevenueChartSkeleton,
+  LatestInvoicesSkeleton,
+  CardsSkeleton,
+} from '@/app/ui/skeletons';
 
-// ✅ Force dynamic rendering (SSR every request)
 export const dynamic = 'force-dynamic';
 
 const lusitana = Lusitana({ subsets: ['latin'], weight: '400' });
 
 export default async function Page() {
-  // ✅ Data fetched on each request
   const revenue = await fetchRevenue();
   const latestInvoices = await fetchLatestInvoices('', 1);
+
   const {
     totalPaidInvoices,
     totalPendingInvoices,
@@ -36,19 +36,20 @@ export default async function Page() {
         Dashboard
       </h1>
 
-    
-
-      {/* --- Charts & Latest Invoices --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
         <Suspense fallback={<RevenueChartSkeleton />}>
-          <RevenueChart revenue={[]} />
+          <RevenueChart revenue={revenue} />
         </Suspense>
-       <Suspense fallback={<LatestInvoicesSkeleton />}>
-          <LatestInvoices latestInvoices={[]} />
+
+        <Suspense fallback={<LatestInvoicesSkeleton />}>
+          <LatestInvoices latestInvoices={latestInvoices} />
         </Suspense>
-         <Suspense fallback={<CardsSkeleton />}>
+
+        <Suspense fallback={<CardsSkeleton />}>
           <CardWrapper />
         </Suspense>
+
       </div>
 
       <p className="mt-8 text-sm text-gray-500">

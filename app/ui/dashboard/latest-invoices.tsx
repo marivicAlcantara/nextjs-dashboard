@@ -1,8 +1,6 @@
-'use client';
+"use client";
 
-import { fetchLatestInvoices } from '@/app/lib/data';
-
-export default async function LatestInvoices({ latestInvoices }: { latestInvoices: any[] }) {
+export default function LatestInvoices({ latestInvoices }: { latestInvoices: any[] }) {
   return (
     <div className="bg-white p-4 rounded-xl shadow-md">
       <h2 className="text-lg font-semibold mb-3">Latest Invoices</h2>
@@ -17,11 +15,11 @@ export default async function LatestInvoices({ latestInvoices }: { latestInvoice
               <p className="font-semibold">₱{invoice.amount}</p>
               <p
                 className={`text-sm ${
-                  invoice.status === 'paid'
-                    ? 'text-green-600'
-                    : invoice.status === 'pending'
-                    ? 'text-yellow-500'
-                    : 'text-red-500'
+                  invoice.status === "paid"
+                    ? "text-green-600"
+                    : invoice.status === "pending"
+                    ? "text-yellow-500"
+                    : "text-red-500"
                 }`}
               >
                 {invoice.status}
