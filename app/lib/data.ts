@@ -1,14 +1,10 @@
 // app/lib/data.ts
 
-// --- PostgreSQL import and connection setup ---
 import postgres from 'postgres';
 
-// Use your database URL from environment variables
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-// --- Sample revenue data (used for your Revenue Chart) ---
 export async function fetchRevenue() {
-  
   return [
     { month: 'January', revenue: 12000 },
     { month: 'February', revenue: 8000 },
@@ -18,7 +14,6 @@ export async function fetchRevenue() {
   ];
 }
 
-// --- Sample invoice data (used for your Invoices Table) ---
 export async function fetchLatestInvoices(query: string, currentPage: number) {
   await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -48,7 +43,6 @@ const customers = [
   { id: 4, name: 'Angela Cruz', email: 'angela@example.com' },
 ];
 
-// --- Dashboard Card Data ---
 export async function fetchCardData() {
   await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -76,4 +70,22 @@ export async function fetchCardData() {
     numberOfInvoices,
     numberOfCustomers,
   };
+}
+
+// --- ADD THIS BELOW (must be OUTSIDE all functions!) ---
+export async function fetchInvoicesPages(query: string) {
+  const invoices = [
+    { id: 1, name: 'John Doe', email: 'john@example.com', amount: 1200, status: 'paid' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', amount: 800, status: 'pending' },
+    { id: 3, name: 'Michael Reyes', email: 'michael@example.com', amount: 1500, status: 'paid' },
+    { id: 4, name: 'Angela Cruz', email: 'angela@example.com', amount: 950, status: 'unpaid' },
+  ];
+
+  const filtered = invoices.filter((invoice) =>
+    invoice.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const itemsPerPage = 5;
+  const pages = Math.ceil(filtered.length / itemsPerPage);
+  return pages;
 }
