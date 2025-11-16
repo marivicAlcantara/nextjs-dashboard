@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 export default function LatestInvoices({ latestInvoices }: { latestInvoices: any[] }) {
   return (
@@ -15,11 +15,11 @@ export default function LatestInvoices({ latestInvoices }: { latestInvoices: any
               <p className="font-semibold">₱{invoice.amount}</p>
               <p
                 className={`text-sm ${
-                  invoice.status === 'paid'
-                    ? 'text-green-600'
-                    : invoice.status === 'pending'
-                    ? 'text-yellow-500'
-                    : 'text-red-500'
+                  invoice.status === "paid"
+                    ? "text-green-600"
+                    : invoice.status === "pending"
+                    ? "text-yellow-500"
+                    : "text-red-500"
                 }`}
               >
                 {invoice.status}

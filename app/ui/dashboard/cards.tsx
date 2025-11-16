@@ -1,3 +1,7 @@
+
+import { fetchCardData } from '@/app/lib/data';
+
+
 import {
   BanknotesIcon,
   ClockIcon,
