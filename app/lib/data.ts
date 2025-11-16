@@ -1,5 +1,3 @@
-// app/lib/data.ts
-
 import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
@@ -49,10 +47,18 @@ const customers = [
   { id: 4, name: 'Angela Cruz', email: 'angela@example.com' },
 ];
 
-// ✅ FIX: EXPORT THIS (You were missing this)
+// ✅ Export fetchCustomers
 export async function fetchCustomers() {
   await new Promise((resolve) => setTimeout(resolve, 200));
   return customers;
+}
+
+// ----------------------
+// FETCH SINGLE INVOICE BY ID
+// ----------------------
+export async function fetchInvoiceById(id: number | string) {
+  const invoices = await fetchLatestInvoices('', 1); // get all invoices (or adjust logic if needed)
+  return invoices.find((invoice) => invoice.id.toString() === id.toString()) || null;
 }
 
 // ----------------------
