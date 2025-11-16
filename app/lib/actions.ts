@@ -34,5 +34,5 @@ export async function createInvoice(formData: FormData) {
   redirect('/dashboard/invoices');
 
   // Test it out:
-  console.log(rawFormData);
+  console.log(FormData);
 }
