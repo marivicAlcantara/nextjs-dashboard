@@ -20,6 +20,30 @@ export async function fetchRevenue() {
     { month: 'May', revenue: 16000 },
   ];
 }
+// --- Returns total number of pages based on query ---
+export async function fetchInvoicesPages(query: string, itemsPerPage = 5) {
+  // Simulate async fetch
+  await new Promise((resolve) => setTimeout(resolve, 200));
+
+  // Example invoice dataset (should match fetchLatestInvoices)
+  const invoices = [
+    { id: 1, name: 'John Doe', email: 'john@example.com', amount: 1200 },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', amount: 800 },
+    { id: 3, name: 'Michael Reyes', email: 'michael@example.com', amount: 1500 },
+    { id: 4, name: 'Angela Cruz', email: 'angela@example.com', amount: 950 },
+  ];
+
+  // Filter by query
+  const filtered = invoices.filter((invoice) =>
+    invoice.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  return totalPages;
+}
+
+
 
 // --- Sample invoice data (used for your Invoices Table) ---
 export async function fetchLatestInvoices(query: string, currentPage: number) {
