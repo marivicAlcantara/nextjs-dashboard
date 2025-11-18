@@ -7,15 +7,12 @@ import { Suspense } from 'react';
 import { lusitana } from '@/app/ui/font';
 import { fetchInvoicesPages } from '@/app/lib/data';
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams?: {
-    query?: string;
-    page?: string;
-  };
-}) {
-  // Get query and page number
+interface InvoicesPageProps {
+  searchParams?: Record<string, string | undefined>;
+}
+
+export default async function Page({ searchParams }: InvoicesPageProps) {
+  // Ensure we can safely read query and page
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
@@ -35,7 +32,7 @@ export default async function Page({
         <CreateInvoice />
       </div>
 
-      {/* Table with Suspense */}
+      {/* Table with suspense fallback */}
       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
       </Suspense>
