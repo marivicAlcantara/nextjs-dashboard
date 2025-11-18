@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
 import InvoiceStatus from '@/app/ui/invoices/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
-import { fetchFilteredInvoices } from '@/app/lib/data';
+import { fetchLatestInvoices } from '@/app/lib/data';
 
 // Define the invoice type (this helps TypeScript understand the data shape)
 interface Invoice {
@@ -24,8 +24,11 @@ interface InvoicesTableProps {
 export default async function InvoicesTable({
   query,
   currentPage,
-}: InvoicesTableProps) {
-  const invoices: Invoice[] = await fetchFilteredInvoices(query, currentPage);
+}: {
+  query: string;
+  currentPage: number;
+}) {
+  const invoices: Invoice[] = await fetchLatestInvoices(query, currentPage);
 
   return (
     <div className="mt-6 flow-root">
