@@ -1,5 +1,5 @@
 'use client';
-
+import { fetchRevenue } from '@/app/lib/data';
 import {
   BarChart,
   Bar,
