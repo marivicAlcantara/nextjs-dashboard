@@ -1,17 +1,14 @@
 // app/lib/data.ts
 
-// --- PostgreSQL import and connection setup ---
 import postgres from 'postgres';
-
-// Use your database URL from environment variables
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-// --- Sample revenue data (used for your Revenue Chart) ---
+// --- Sample revenue data ---
 export async function fetchRevenue() {
-   console.log('Fetching revenue data...');
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+  console.log('Fetching revenue data...');
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  console.log('Data fetch completed after 3 seconds.');
 
-    console.log('Data fetch completed after 3 seconds.');
   return [
     { month: 'January', revenue: 12000 },
     { month: 'February', revenue: 8000 },
@@ -20,12 +17,11 @@ export async function fetchRevenue() {
     { month: 'May', revenue: 16000 },
   ];
 }
+
 // --- Returns total number of pages based on query ---
-export async function fetchInvoicesPages(query: string, itemsPerPage = 5) {
-  // Simulate async fetch
+export async function fetchInvoicesPages(query: string = '', itemsPerPage = 5) {
   await new Promise((resolve) => setTimeout(resolve, 200));
 
-  // Example invoice dataset (should match fetchLatestInvoices)
   const invoices = [
     { id: 1, name: 'John Doe', email: 'john@example.com', amount: 1200 },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', amount: 800 },
@@ -33,20 +29,15 @@ export async function fetchInvoicesPages(query: string, itemsPerPage = 5) {
     { id: 4, name: 'Angela Cruz', email: 'angela@example.com', amount: 950 },
   ];
 
-  // Filter by query
   const filtered = invoices.filter((invoice) =>
     invoice.name.toLowerCase().includes(query.toLowerCase())
   );
 
-  // Calculate total pages
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  return totalPages;
+  return Math.ceil(filtered.length / itemsPerPage);
 }
 
-
-
-// --- Sample invoice data (used for your Invoices Table) ---
-export async function fetchLatestInvoices(query: string, currentPage: number) {
+// --- Sample invoice data ---
+export async function fetchLatestInvoices(query: string = '', currentPage: number = 1) {
   await new Promise((resolve) => setTimeout(resolve, 300));
 
   const invoices = [

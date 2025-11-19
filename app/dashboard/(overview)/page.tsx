@@ -2,57 +2,41 @@
 import { Card } from '@/app/ui/dashboard/cards';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
-import { Lusitana } from 'next/font/google';
-import { fetchCardData } from '@/app/lib/data'; // Remove fetchLatestInvoices
-import CardWrapper from '@/app/ui/dashboard/cards';
+import { fetchCardData, fetchLatestInvoices, fetchRevenue } from '@/app/lib/data';
 import { Suspense } from 'react';
-import { RevenueChartSkeleton,
-  LatestInvoicesSkeleton,
-   CardsSkeleton,
-
-  } from '@/app/ui/skeletons';
-import latestInvoices from '@/app/ui/dashboard/latest-invoices';
-
-
-const lusitana = Lusitana({ subsets: ['latin'], weight: '400' });
+import CardWrapper from '@/app/ui/dashboard/cards';
+import { RevenueChartSkeleton, LatestInvoicesSkeleton, CardsSkeleton} from '@/app/ui/skeletons';
+import { lusitana } from '@/app/ui/font';
 
 export default async function Page() {
-  
-  
-
+  const latestInvoices = await fetchLatestInvoices('', 1); // make sure query and page are passed
   const {
-    totalPaidInvoices,
-    totalPendingInvoices,
     numberOfInvoices,
     numberOfCustomers,
+    totalPaidInvoices,
+    totalPendingInvoices,
   } = await fetchCardData();
 
+  const revenueData = await fetchRevenue(); // fetch revenue data
+
   return (
-    <main className="p-6">
-      <h1 className={`${lusitana.className} mb-6 text-2xl font-bold`}>
+    <main>
+      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
         Dashboard
       </h1>
 
-      {/* --- Dashboard Summary Cards --- */}
-      {/* <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8"> */}
-        {/* <Card title="Collected" value={totalPaidInvoices} type="collected" /> */}
-        {/* <Card title="Pending" value={totalPendingInvoices} type="pending" /> */}
-        {/* <Card title="Total Invoices" value={numberOfInvoices} type="invoices" /> */}
-        {/* <Card title="Total Customers" value={numberOfCustomers} type="customers" /> */}
-      {/* </div> */}
-
-      {/* --- Charts & Latest Invoices --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Revenue Chart + Latest Invoices */}
+      <div className="col-span-1 md:col-span-2 lg:col-span-4 p-4 bg-white rounded-lg shadow">
         <Suspense fallback={<RevenueChartSkeleton />}>
-          <RevenueChart revenue={[]}/>
+          <RevenueChart revenue={revenueData} />
         </Suspense>
         <Suspense fallback={<LatestInvoicesSkeleton />}>
-          <LatestInvoices latestInvoices={[]} />
+          <LatestInvoices latestInvoices={latestInvoices} />
+
         </Suspense>
          <Suspense fallback={<CardsSkeleton />}>
           <CardWrapper />
         </Suspense>
-       
       </div>
     </main>
   );

@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-export default function RevenueChart({ revenue }: { revenue: any[] }) {
+export default  function RevenueChart({ revenue }: { revenue: any[] }) {
   return (
     <div className="bg-white p-4 rounded-xl shadow-md">
       <h2 className="text-lg font-semibold mb-3">Revenue Chart</h2>
