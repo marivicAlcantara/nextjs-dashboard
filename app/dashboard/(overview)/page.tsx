@@ -25,6 +25,18 @@ export default async function Page() {
         Dashboard
       </h1>
 
+      {/* Dashboard Cards */}
+      {/* <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"> */}
+        {/* <Card title="Collected" value={totalPaidInvoices} type="collected" /> */}
+        {/* <Card title="Pending" value={totalPendingInvoices} type="pending" /> */}
+        {/* <Card title="Total Invoices" value={numberOfInvoices} type="invoices" /> */}
+        {/* <Card */}
+          {/* title="Total Customers" */}
+          {/* value={numberOfCustomers} */}
+          {/* type="customers" */}
+        {/* /> */}
+      {/* </div> */}
+
       {/* Revenue Chart + Latest Invoices */}
       <div className="col-span-1 md:col-span-2 lg:col-span-4 p-4 bg-white rounded-lg shadow">
         <Suspense fallback={<RevenueChartSkeleton />}>
@@ -34,9 +46,7 @@ export default async function Page() {
           <LatestInvoices latestInvoices={latestInvoices} />
 
         </Suspense>
-         <Suspense fallback={<CardsSkeleton />}>
-          <CardWrapper />
-        </Suspense>
+        
       </div>
     </main>
   );
