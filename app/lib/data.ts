@@ -59,12 +59,22 @@ export async function fetchLatestInvoices(query: string = '', currentPage: numbe
 }
 
 // --- Mock customer data ---
+
 const customers = [
   { id: 1, name: 'John Doe', email: 'john@example.com' },
   { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
   { id: 3, name: 'Michael Reyes', email: 'michael@example.com' },
   { id: 4, name: 'Angela Cruz', email: 'angela@example.com' },
 ];
+// --- Fetch customers (mock data) ---
+export async function fetchCustomers() {
+  await new Promise((resolve) => setTimeout(resolve, 200)); // simulate delay
+  //Return only the fields the Form expects
+  return customers.map((c) => ({
+    id: c.id.toString(),  // Ensure id is a string
+    name: c.name,
+  }));
+}
 
 // --- Dashboard Card Data ---
 export async function fetchCardData() {
