@@ -7,42 +7,48 @@ import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
+// Validate form data properly
 const FormSchema = z.object({
-  id: z.string(),
-  customerId: z.string(), // should be UUID
-  amount: z.coerce.number(),
+  id: z.string().optional(),
+  customerId: z.string().uuid({ message: 'Invalid customer UUID' }),
+  amount: z.coerce.number().positive({ message: 'Amount must be positive' }),
   status: z.enum(['pending', 'paid']),
-  date: z.string(),
+  date: z.string().optional(),
 });
 
+// Omit id and date for creation
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 
 export async function createInvoice(formData: FormData) {
   // Parse and validate form data
-  const { customerId, amount, status } = CreateInvoice.parse({
+  const parsed = CreateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
 
-  // Make sure customerId is a string (UUID)
-  const customerUUID = String(customerId);
+  if (!parsed.success) {
+    console.error('Validation failed', parsed.error.flatten());
+    throw new Error('Invalid form data');
+  }
+
+  const { customerId, amount, status } = parsed.data;
 
   // Convert amount to cents
   const amountInCents = Math.round(amount * 100);
 
-  // Get current date in YYYY-MM-DD format
+  // Get current date
   const date = new Date().toISOString().split('T')[0];
 
-  // Insert into DB safely
+  // Insert safely into DB
   await sql`
     INSERT INTO invoices (customer_id, amount, status, date)
-    VALUES (${customerUUID}::uuid, ${amountInCents}, ${status}, ${date})
+    VALUES (${customerId}::uuid, ${amountInCents}, ${status}, ${date})
   `;
 
   // Revalidate invoices page and redirect
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
 
-  console.log('Invoice created:', { customerUUID, amountInCents, status, date });
+  console.log('Invoice created:', { customerId, amountInCents, status, date });
 }
