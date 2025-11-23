@@ -3,11 +3,27 @@
 import postgres from 'postgres';
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-// --- Sample revenue data ---
+/* ----------------------------------------
+   FETCH REAL CUSTOMERS (UUID IDs)
+---------------------------------------- */
+export async function fetchCustomers() {
+  const customers = await sql`
+    SELECT id, name
+    FROM customers
+    ORDER BY name ASC
+  `;
+
+  return customers.map((c: any) => ({
+    id: c.id,      // UUID – required by your form
+    name: c.name,
+  }));
+}
+
+/* ----------------------------------------
+   MOCK REVENUE (OK TO KEEP)
+---------------------------------------- */
 export async function fetchRevenue() {
-  console.log('Fetching revenue data...');
   await new Promise((resolve) => setTimeout(resolve, 3000));
-  console.log('Data fetch completed after 3 seconds.');
 
   return [
     { month: 'January', revenue: 12000 },
@@ -18,15 +34,18 @@ export async function fetchRevenue() {
   ];
 }
 
-// --- Returns total number of pages based on query ---
+/* ----------------------------------------
+   MOCK PAGINATION FOR DEMO
+---------------------------------------- */
 export async function fetchInvoicesPages(query: string = '', itemsPerPage = 5) {
   await new Promise((resolve) => setTimeout(resolve, 200));
 
+  // Mock data still OK
   const invoices = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', amount: 1200 },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', amount: 800 },
-    { id: 3, name: 'Michael Reyes', email: 'michael@example.com', amount: 1500 },
-    { id: 4, name: 'Angela Cruz', email: 'angela@example.com', amount: 950 },
+    { id: 1, name: 'John Doe', amount: 1200 },
+    { id: 2, name: 'Jane Smith', amount: 800 },
+    { id: 3, name: 'Michael Reyes', amount: 1500 },
+    { id: 4, name: 'Angela Cruz', amount: 950 },
   ];
 
   const filtered = invoices.filter((invoice) =>
@@ -36,7 +55,9 @@ export async function fetchInvoicesPages(query: string = '', itemsPerPage = 5) {
   return Math.ceil(filtered.length / itemsPerPage);
 }
 
-// --- Sample invoice data ---
+/* ----------------------------------------
+   MOCK INVOICES LIST (SAFE TO KEEP)
+---------------------------------------- */
 export async function fetchLatestInvoices(query: string = '', currentPage: number = 1) {
   await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -53,30 +74,13 @@ export async function fetchLatestInvoices(query: string = '', currentPage: numbe
 
   const itemsPerPage = 5;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
 
-  return paginated;
+  return filtered.slice(startIndex, startIndex + itemsPerPage);
 }
 
-// --- Mock customer data ---
-
-const customers = [
-  { id: 1, name: 'John Doe', email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-  { id: 3, name: 'Michael Reyes', email: 'michael@example.com' },
-  { id: 4, name: 'Angela Cruz', email: 'angela@example.com' },
-];
-// --- Fetch customers (mock data) ---
-export async function fetchCustomers() {
-  await new Promise((resolve) => setTimeout(resolve, 200)); // simulate delay
-  //Return only the fields the Form expects
-  return customers.map((c) => ({
-    id: c.id.toString(),  // Ensure id is a string
-    name: c.name,
-  }));
-}
-
-// --- Dashboard Card Data ---
+/* ----------------------------------------
+   DASHBOARD CARD DATA
+---------------------------------------- */
 export async function fetchCardData() {
   await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -95,14 +99,10 @@ export async function fetchCardData() {
     .filter((i) => i.status === 'pending')
     .reduce((sum, i) => sum + i.amount, 0);
 
-  const numberOfInvoices = invoices.length;
-  const numberOfCustomers = customers.length;
-
   return {
     totalPaidInvoices,
     totalPendingInvoices,
-    numberOfInvoices,
-    numberOfCustomers,
+    numberOfInvoices: invoices.length,
+    numberOfCustomers: invoices.length, // You can change this later
   };
-  
 }
