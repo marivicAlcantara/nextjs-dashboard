@@ -4,7 +4,7 @@ import postgres from 'postgres';
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 /* ----------------------------------------
-   FETCH REAL CUSTOMERS (UUID IDs)
+   FETCH CUSTOMERS
 ---------------------------------------- */
 export async function fetchCustomers() {
   const customers = await sql`
@@ -13,96 +13,103 @@ export async function fetchCustomers() {
     ORDER BY name ASC
   `;
 
-  return customers.map((c: any) => ({
-    id: c.id,      // UUID – required by your form
-    name: c.name,
-  }));
+  return customers;
 }
 
 /* ----------------------------------------
-   MOCK REVENUE (OK TO KEEP)
+   FETCH SINGLE INVOICE BY ID (FOR EDIT PAGE)
 ---------------------------------------- */
-export async function fetchRevenue() {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+export async function fetchInvoiceById(id: string) {
+  const invoice = await sql`
+    SELECT id, customer_id, amount, status, date
+    FROM invoices
+    WHERE id = ${id}::uuid
+    LIMIT 1
+  `;
 
-  return [
-    { month: 'January', revenue: 12000 },
-    { month: 'February', revenue: 8000 },
-    { month: 'March', revenue: 14000 },
-    { month: 'April', revenue: 9000 },
-    { month: 'May', revenue: 16000 },
-  ];
+  return invoice[0] || null;
 }
 
 /* ----------------------------------------
-   MOCK PAGINATION FOR DEMO
+   FETCH LATEST INVOICES (LIST ON INVOICES PAGE)
+---------------------------------------- */
+export async function fetchLatestInvoices(query: string = '', page: number = 1, itemsPerPage = 5) {
+  const offset = (page - 1) * itemsPerPage;
+
+  const invoices = await sql`
+    SELECT 
+      invoices.id,
+      invoices.amount,
+      invoices.status,
+      invoices.date,
+      customers.name,
+      customers.email,
+      '/default-avatar.png' AS image_url
+    FROM invoices
+    JOIN customers ON invoices.customer_id = customers.id
+    WHERE customers.name ILIKE ${'%' + query + '%'}
+    ORDER BY invoices.date DESC
+    LIMIT ${itemsPerPage} OFFSET ${offset}
+  `;
+
+  return invoices;
+}
+
+/* ----------------------------------------
+   PAGINATION: COUNT INVOICES
 ---------------------------------------- */
 export async function fetchInvoicesPages(query: string = '', itemsPerPage = 5) {
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  const count = await sql`
+    SELECT COUNT(*) 
+    FROM invoices
+    JOIN customers ON invoices.customer_id = customers.id
+    WHERE customers.name ILIKE ${'%' + query + '%'}
+  `;
 
-  // Mock data still OK
-  const invoices = [
-    { id: 1, name: 'John Doe', amount: 1200 },
-    { id: 2, name: 'Jane Smith', amount: 800 },
-    { id: 3, name: 'Michael Reyes', amount: 1500 },
-    { id: 4, name: 'Angela Cruz', amount: 950 },
-  ];
-
-  const filtered = invoices.filter((invoice) =>
-    invoice.name.toLowerCase().includes(query.toLowerCase())
-  );
-
-  return Math.ceil(filtered.length / itemsPerPage);
+  const total = Number(count[0].count);
+  return Math.ceil(total / itemsPerPage);
 }
 
 /* ----------------------------------------
-   MOCK INVOICES LIST (SAFE TO KEEP)
----------------------------------------- */
-export async function fetchLatestInvoices(query: string = '', currentPage: number = 1) {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  const invoices = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', amount: 1200, date: '2025-10-10', status: 'paid', image_url: '/default-avatar.png' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', amount: 800, date: '2025-10-11', status: 'pending', image_url: '/default-avatar.png' },
-    { id: 3, name: 'Michael Reyes', email: 'michael@example.com', amount: 1500, date: '2025-10-12', status: 'paid', image_url: '/default-avatar.png' },
-    { id: 4, name: 'Angela Cruz', email: 'angela@example.com', amount: 950, date: '2025-10-13', status: 'unpaid', image_url: '/default-avatar.png' },
-  ];
-
-  const filtered = invoices.filter((invoice) =>
-    invoice.name.toLowerCase().includes(query.toLowerCase())
-  );
-
-  const itemsPerPage = 5;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-
-  return filtered.slice(startIndex, startIndex + itemsPerPage);
-}
-
-/* ----------------------------------------
-   DASHBOARD CARD DATA
+   DASHBOARD CARDS (SUMMARY STATISTICS)
 ---------------------------------------- */
 export async function fetchCardData() {
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  const totals = await sql`
+    SELECT
+      SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS total_paid,
+      SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS total_pending,
+      COUNT(*) AS total_invoices
+    FROM invoices
+  `;
 
-  const invoices = [
-    { amount: 1200, status: 'paid' },
-    { amount: 800, status: 'pending' },
-    { amount: 1500, status: 'paid' },
-    { amount: 950, status: 'unpaid' },
-  ];
-
-  const totalPaidInvoices = invoices
-    .filter((i) => i.status === 'paid')
-    .reduce((sum, i) => sum + i.amount, 0);
-
-  const totalPendingInvoices = invoices
-    .filter((i) => i.status === 'pending')
-    .reduce((sum, i) => sum + i.amount, 0);
+  const customers = await sql`
+    SELECT COUNT(*) FROM customers
+  `;
 
   return {
-    totalPaidInvoices,
-    totalPendingInvoices,
-    numberOfInvoices: invoices.length,
-    numberOfCustomers: invoices.length, // You can change this later
+    totalPaidInvoices: Number(totals[0].total_paid || 0),
+    totalPendingInvoices: Number(totals[0].total_pending || 0),
+    numberOfInvoices: Number(totals[0].total_invoices),
+    numberOfCustomers: Number(customers[0].count),
   };
+}
+
+/* ----------------------------------------
+   REVENUE CHART DATA (MONTHLY TOTALS)
+---------------------------------------- */
+export async function fetchRevenue() {
+  const revenue = await sql`
+    SELECT 
+      TO_CHAR(date, 'Month') AS month,
+      SUM(amount) AS revenue
+    FROM invoices
+    WHERE status = 'paid'
+    GROUP BY month, DATE_TRUNC('month', date)
+    ORDER BY DATE_TRUNC('month', date)
+  `;
+
+  return revenue.map(r => ({
+    month: r.month.trim(),
+    revenue: Number(r.revenue),
+  }));
 }
