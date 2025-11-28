@@ -7,7 +7,9 @@ import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-// Validate form data properly
+// ----------------------
+// Zod Schema
+// ----------------------
 const FormSchema = z.object({
   id: z.string().optional(),
   customerId: z.string().uuid({ message: 'Invalid customer UUID' }),
@@ -15,16 +17,24 @@ const FormSchema = z.object({
   status: z.enum(['pending', 'paid']),
   date: z.string().optional(),
 });
+
+// Remove ID + date for creation
+const CreateInvoice = FormSchema.omit({ id: true, date: true });
+
+// ----------------------
+// DELETE INVOICE
+// ----------------------
 export async function deleteInvoice(id: string) {
+  throw new Error('Failed to Delete Invoice');
   await sql`DELETE FROM invoices WHERE id = ${id}`;
   revalidatePath('/dashboard/invoices');
 }
 
-// Omit id and date for creation
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
-
+// ----------------------
+// CREATE INVOICE
+// ----------------------
 export async function createInvoice(formData: FormData) {
-  // Parse and validate form data
+  // Validate incoming form data
   const parsed = CreateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
@@ -32,27 +42,25 @@ export async function createInvoice(formData: FormData) {
   });
 
   if (!parsed.success) {
-    console.error('Validation failed', parsed.error.flatten());
-    throw new Error('Invalid form data');
+    console.error('Validation failed:', parsed.error.flatten());
+    return { message: 'Invalid form data.' };
   }
 
   const { customerId, amount, status } = parsed.data;
-
-  // Convert amount to cents
   const amountInCents = Math.round(amount * 100);
-
-  // Get current date
   const date = new Date().toISOString().split('T')[0];
 
-  // Insert safely into DB
-  await sql`
-    INSERT INTO invoices (customer_id, amount, status, date)
-    VALUES (${customerId}::uuid, ${amountInCents}, ${status}, ${date})
-  `;
+  try {
+    await sql`
+      INSERT INTO invoices (customer_id, amount, status, date)
+      VALUES (${customerId}::uuid, ${amountInCents}, ${status}, ${date})
+    `;
+  } catch (error) {
+    console.error('DATABASE ERROR:', error);
+    return { message: 'Database Error: Failed to Create Invoice.' };
+  }
 
-  // Revalidate invoices page and redirect
+  // redirect MUST be outside try/catch
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
-
-  console.log('Invoice created:', { customerId, amountInCents, status, date });
 }
