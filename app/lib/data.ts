@@ -12,8 +12,7 @@ export async function fetchCustomers() {
     FROM customers
     ORDER BY name ASC
   `;
-
-  return customers;
+  return customers as unknown as { id: string; name: string }[];
 }
 
 /* ----------------------------------------
