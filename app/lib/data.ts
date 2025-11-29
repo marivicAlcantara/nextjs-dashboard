@@ -25,6 +25,7 @@ export async function fetchInvoiceById(id: string) {
     WHERE id = ${id}::uuid
     LIMIT 1
   `;
+  console.log(invoice); // Invoice is an empty array []
 
   return invoice[0] || null;
 }

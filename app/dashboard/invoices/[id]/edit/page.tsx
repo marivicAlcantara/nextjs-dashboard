@@ -1,18 +1,22 @@
 import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
 import EditInvoiceForm from '@/app/ui/invoices/edit-form';
 import { fetchCustomers, fetchInvoiceById } from '@/app/lib/data';
+import { notFound } from 'next/navigation';
 
 interface PageProps {
   params: { id: string };
 }
 
-export default async function EditInvoicePage({ params }: PageProps) {
-  const { id } = params;
-
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const id = params.id;
   const [invoice, customers] = await Promise.all([
-    fetchInvoiceById(id),   // returns invoice object from DB
-    fetchCustomers(),       // returns customers list
+    fetchInvoiceById(id),
+    fetchCustomers(),
   ]);
+   if (!invoice) {
+    notFound();
+  }
 
   return (
     <main className="p-6">
