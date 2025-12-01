@@ -35,7 +35,7 @@ export async function fetchRevenue() {
 }
 
 
-export async function fetchLatestInvoices() {
+export async function fetchLatestInvoices(p0: string, p1: number) {
   try {
     const rows = await sql<LatestInvoiceRaw[]>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
