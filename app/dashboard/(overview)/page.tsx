@@ -1,54 +1,38 @@
-// app/dashboard/page.tsx
 import { Card } from '@/app/ui/dashboard/cards';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
-import { fetchCardData, fetchLatestInvoices, fetchRevenue } from '@/app/lib/data';
-import { Suspense } from 'react';
-import CardWrapper from '@/app/ui/dashboard/cards';
-import { RevenueChartSkeleton, LatestInvoicesSkeleton, CardsSkeleton} from '@/app/ui/skeletons';
 import { lusitana } from '@/app/ui/font';
-
+import { fetchCardData} from '@/app/lib/data';
+import { Suspense } from 'react';
+import { RevenueChartSkeleton, LatestInvoicesSkeleton, CardsSkeleton, } from '@/app/ui/skeletons';
+import CardWrapper from '@/app/ui/dashboard/cards';
+ 
 export default async function Page() {
-  const latestInvoices = await fetchLatestInvoices('', 1); // make sure query and page are passed
-  const {
+  
+ 
+      const {
     numberOfInvoices,
     numberOfCustomers,
     totalPaidInvoices,
     totalPendingInvoices,
   } = await fetchCardData();
-
-  const revenueData = await fetchRevenue(); // fetch revenue data
-
   return (
     <main>
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
         Dashboard
       </h1>
-
-      {/* Dashboard Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Card title="Collected" value={totalPaidInvoices} type="collected" />
-        <Card title="Pending" value={totalPendingInvoices} type="pending" />
-        <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
-        <Card
-          title="Total Customers"
-          value={numberOfCustomers}
-          type="customers"
-        />
+      <Suspense fallback={<CardsSkeleton />}>
+          <CardWrapper />
+        </Suspense>
       </div>
-
-      {/* Revenue Chart + Latest Invoices */}
-      <div className="col-span-1 md:col-span-2 lg:col-span-4 p-4 bg-white rounded-lg shadow">
-        <Suspense fallback={<RevenueChartSkeleton />}>
-          <RevenueChart revenue={revenueData} />
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
+         <Suspense fallback={<RevenueChartSkeleton />}>
+          <RevenueChart revenue={[]} />
         </Suspense>
         <Suspense fallback={<LatestInvoicesSkeleton />}>
-          <LatestInvoices latestInvoices={latestInvoices} />
+          <LatestInvoices latestInvoices={[]} />
         </Suspense>
-         <Suspense fallback={<CardsSkeleton />}>
-          <CardWrapper/>
-        </Suspense>
-        
       </div>
     </main>
   );
