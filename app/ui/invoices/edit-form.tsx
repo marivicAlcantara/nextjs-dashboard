@@ -2,7 +2,7 @@
 
 import { CustomerField, InvoiceForm } from '@/app/lib/definitions';
 import { updateInvoice } from '@/app/lib/actions';
-import { useFormState } from 'react-dom';
+import React from 'react';
 import {
   CheckIcon,
   ClockIcon,
@@ -23,7 +23,7 @@ export default function EditInvoiceForm({
 
   // Connect UI form → server action
   const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
-  const [state, formAction] = useFormState(updateInvoiceWithId, initialState);
+  const [state, formAction] = React.useActionState(updateInvoiceWithId, initialState);
 
   return (
     <form action={formAction}>
