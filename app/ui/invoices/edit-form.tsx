@@ -2,7 +2,7 @@
 
 import { CustomerField, InvoiceForm } from '@/app/lib/definitions';
 import { updateInvoice } from '@/app/lib/actions';
-import React from 'react';
+import * as React from 'react';
 import {
   CheckIcon,
   ClockIcon,
@@ -19,17 +19,26 @@ export default function EditInvoiceForm({
   invoice: InvoiceForm;
   customers: CustomerField[];
 }) {
-  const initialState = { message: null, errors: {} };
+  // FIX: message must be a string (React.useActionState requirement)
+  const initialState = {
+    message: '',
+    errors: {},
+  };
 
-  // Connect UI form → server action
+  // Bind ID → server action now matches (prevState, formData)
   const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
-  const [state, formAction] = React.useActionState(updateInvoiceWithId, initialState);
+
+  // FIX: Using React.useActionState (correct hook for React 19)
+  const [state, formAction] = React.useActionState(
+    updateInvoiceWithId,
+    initialState
+  );
 
   return (
     <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
 
-        {/* Customer Name */}
+        {/* Customer selection */}
         <div className="mb-4">
           <label htmlFor="customer" className="mb-2 block text-sm font-medium">
             Choose customer
@@ -39,19 +48,22 @@ export default function EditInvoiceForm({
               id="customer"
               name="customerId"
               defaultValue={invoice.customer_id}
-              className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2"
+              className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm"
             >
               <option value="" disabled>Select a customer</option>
-              {customers.map(customer => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name}
+              {customers.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
                 </option>
               ))}
             </select>
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
+
           {state.errors?.customerId && (
-            <p className="text-red-600 text-sm mt-1">{state.errors.customerId}</p>
+            <p className="text-red-600 text-sm mt-1">
+              {state.errors.customerId}
+            </p>
           )}
         </div>
 
@@ -71,6 +83,7 @@ export default function EditInvoiceForm({
             />
             <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
+
           {state.errors?.amount && (
             <p className="text-red-600 text-sm mt-1">{state.errors.amount}</p>
           )}
@@ -81,9 +94,10 @@ export default function EditInvoiceForm({
           <legend className="mb-2 block text-sm font-medium">
             Set the invoice status
           </legend>
+
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">
-              
+
               <div className="flex items-center">
                 <input
                   id="pending"
@@ -114,6 +128,7 @@ export default function EditInvoiceForm({
 
             </div>
           </div>
+
           {state.errors?.status && (
             <p className="text-red-600 text-sm mt-1">{state.errors.status}</p>
           )}
@@ -129,10 +144,11 @@ export default function EditInvoiceForm({
         >
           Cancel
         </Link>
+
         <Button type="submit">Edit Invoice</Button>
       </div>
 
-      {/* Form error message */}
+      {/* Server error message */}
       {state.message && (
         <p className="text-red-600 mt-3">{state.message}</p>
       )}
